@@ -9,7 +9,8 @@ def get_active_dialogs():
     question_dict = {}
     answer_dict = {}
     checkpoints = db.fetchall_with_filter("checkpoints", ["connection_id"], [f"solved=0"])
-
+    if len(checkpoints) == 0:
+        return None
     connection_ids = tuple([c["connection_id"] for c in checkpoints])
     connections = db.fetchall_with_filter("connections", ["id", "prev_question_id", "answer_id"],
                                           [f"id in {connection_ids}"

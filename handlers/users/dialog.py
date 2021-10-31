@@ -10,9 +10,10 @@ from keyboards.inline.suggest_question import add_question_to_connection, finish
 from loader import dp
 from states.add_question_to_connection import QuestionToConnection
 from states.start_dialog import Dialog
+from utils.db_api.adept_dao import get_adept_by_id
 from utils.db_api.answer_dao import add_answer
 from utils.db_api.checkpoint_dao import add_checkpoint, has_not_checkpoint, get_checkpoint_by_user_id, \
-    is_not_solved_checkpoint, update_checkpoint_to_solve, update_checkpoint_to_unsolve
+    is_not_solved_checkpoint, update_checkpoint_to_solve, update_checkpoint_to_unsolve, remove_checkpoint
 from utils.db_api.connection_dao import add_connection, update_connection_with_answer, \
     update_connection_with_next_question, get_next_question_by_id, get_prev_question_by_id
 from utils.db_api.dialog_dao import get_dialog_detailed
@@ -23,7 +24,8 @@ from utils.db_api.theme_dao import get_random_theme_by_adept
 
 @dp.callback_query_handler(open_menu_callback.filter(menu="dialog_start"), state=None)
 async def start_dialog(call: CallbackQuery, callback_data: dict):
-    await call.message.edit_text(f"Диалог уже есть")
+    adept_name = get_adept_by_id(callback_data.get("id"))
+    await call.message.edit_text(f"Диалог уже есть с '{adept_name}'")
     question = {"name": "Error"}  # TODO Какой это случай?
     checkpoint = get_checkpoint_by_user_id(call.from_user.id)
     if checkpoint is not None:
@@ -35,7 +37,7 @@ async def start_dialog(call: CallbackQuery, callback_data: dict):
         prev_question_id = question.get("id")
         connection_id = add_connection(prev_question_id)
         add_checkpoint(connection_id, call.from_user.id)
-        await call.message.edit_text(f"Диалог начат. Приятного общения")
+        await call.message.edit_text(f"Диалог начат. Приятного общения. Чтобы попрощаться, введите 'пока'")
     await call.message.answer(question.get("name"))
     await Dialog.ANSWER.set()
 
@@ -45,6 +47,7 @@ async def catch_answer(message: types.Message, state: FSMContext):
     data = await state.get_data()
     if message.text.lower() == "пока":
         await state.finish()
+        remove_checkpoint(message.from_user.id)
         await message.answer("Диалог окончен", reply_markup=finish_suggest)
         return
     answer = message.text
@@ -71,7 +74,11 @@ async def catch_answer(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(open_menu_callback.filter(menu="show_dialogs"))
 async def show_active_dialogs(call: CallbackQuery):
-    await call.message.edit_text("Список активных диалогов:", reply_markup=get_active_dialogs())
+    active_dialogs = get_active_dialogs()
+    if active_dialogs is not None:
+        await call.message.edit_text("Список активных диалогов:", reply_markup=get_active_dialogs())
+    else:
+        await call.message.edit_text("Нет активных диалогов. Нажмите /manage, чтобы вернуться")
 
 
 @dp.callback_query_handler(open_menu_callback.filter(menu="dialog_detailed"))

@@ -9,6 +9,11 @@ def add_checkpoint(connection_id, user_id):
     return inserted_row_id
 
 
+def remove_checkpoint(user_id):
+    cursor = db.get_cursor()
+    cursor.execute(f"delete from checkpoints where user_id={user_id}")
+
+
 def update_checkpoint_to_solve(connection_id):
     cursor = db.get_cursor()
     cursor.execute("UPDATE checkpoints SET solved=1 WHERE connection_id= ?", (connection_id,))
