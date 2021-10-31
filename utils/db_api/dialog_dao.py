@@ -10,9 +10,9 @@ def get_dialog_detailed(connection_id) -> list:
     answer_ids = []
     question_dict = {}
     answer_dict = {}
+    consequence_ids.append(connection.get("answer_id"))
     consequence_ids.append(prev_question_id)
     question_ids.append(prev_question_id)
-    consequence_ids.append(connection.get("answer_id"))
     answer_ids.append(connection.get("answer_id"))
     while True:
 
@@ -23,8 +23,8 @@ def get_dialog_detailed(connection_id) -> list:
         prev_connection = prev_connections[0]
         prev_question_id = prev_connection.get("prev_question_id")
         question_ids.append(prev_question_id)
-        consequence_ids.append(prev_question_id)
         consequence_ids.append(prev_connection.get("answer_id"))
+        consequence_ids.append(prev_question_id)
         answer_ids.append(prev_connection.get("answer_id"))
 
     questions = db.fetchall_with_filter("questions", ["id", "name"],
