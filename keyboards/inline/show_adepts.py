@@ -7,13 +7,13 @@ from utils.db_api import db
 show_adepts = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(
-            text="Показать адептов",
+            text="Выбрать адепта",
             callback_data=open_menu_callback.new(menu="show_adepts", id="0")
         )
     ],
     [
         InlineKeyboardButton(
-            text="Предложить свою тему",
+            text="Предложить свой вопрос",
             callback_data=open_menu_callback.new(menu="suggest_theme", id="0")
         )
     ],

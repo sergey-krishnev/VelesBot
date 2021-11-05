@@ -12,7 +12,7 @@ from utils.db_api.adept_dao import get_adept_by_id
 
 @dp.callback_query_handler(open_menu_callback.filter(menu="show_adepts"))
 async def show_adepts(call: CallbackQuery):
-    await call.message.edit_text("Выберите, чтобы посмотреть, о чем можно поговорить с каждым адептом:",
+    await call.message.edit_text("Выбрать адепта:",
                                  reply_markup=get_client_adept_keyboard())
 
 
