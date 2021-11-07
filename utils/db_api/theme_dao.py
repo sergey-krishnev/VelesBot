@@ -2,9 +2,10 @@ from utils.db_api import db
 import random
 
 
-def add_theme(theme_name, adept_id):
+def add_theme(theme_name, trust_level, adept_id):
     inserted_row_id = db.insert("themes", {
         "name": theme_name,
+        "trust_level": trust_level,
         "adept_id": adept_id
     })
     return inserted_row_id

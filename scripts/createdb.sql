@@ -16,6 +16,7 @@ CREATE TABLE themes
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     adept_id integer NOT NULL,
+    trust_level integer NOT NULL,
     FOREIGN KEY (adept_id) REFERENCES adepts(id)
 );
 
