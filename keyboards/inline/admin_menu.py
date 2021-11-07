@@ -11,6 +11,12 @@ admin_menu = InlineKeyboardMarkup(inline_keyboard=[
     ],
     [
         InlineKeyboardButton(
+            text="Получить резервную копию базы",
+            callback_data=open_menu_callback.new(menu="get_db", id="0")
+        )
+    ],
+    [
+        InlineKeyboardButton(
             text="Добавить адепта",
             callback_data=open_menu_callback.new(menu="add_adept", id="0")
         )

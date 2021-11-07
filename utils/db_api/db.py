@@ -1,5 +1,6 @@
 import os
 from typing import Dict, List, Any
+import io
 
 import sqlite3
 
@@ -74,6 +75,12 @@ def _init_db(cursor):
     cursor.executescript(sql)
 
 
+def add_adepts(cursor):
+    with io.open(os.path.join("scripts", "create_adepts.sql"), encoding='utf-8') as f:
+        sql = f.read()
+    cursor.executescript(sql)
+
+
 def check_db_exists():
     cursor = conn.cursor()
     """Проверяет, инициализирована ли БД, если нет — инициализирует"""
@@ -84,6 +91,7 @@ def check_db_exists():
         cursor.close()
         return
     _init_db(cursor)
+    add_adepts(cursor)
     cursor.close()
 
 
