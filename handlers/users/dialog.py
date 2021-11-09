@@ -42,14 +42,16 @@ async def start_dialog(call: CallbackQuery, callback_data: dict):
     await Dialog.ANSWER.set()
 
 
+@dp.message_handler(lambda message: message.text.lower() == "пока", state=Dialog.ANSWER)
+async def catch_goodbye(message: types.Message, state: FSMContext):
+    remove_checkpoint(message.from_user.id)
+    await message.answer("Диалог окончен", reply_markup=finish_suggest)
+    await state.finish()
+
+
 @dp.message_handler(state=Dialog.ANSWER)
 async def catch_answer(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    if message.text.lower() == "пока":
-        await state.finish()
-        remove_checkpoint(message.from_user.id)
-        await message.answer("Диалог окончен", reply_markup=finish_suggest)
-        return
     answer = message.text
     if data.get("answer") is not None:
         answer = data.get("answer")
