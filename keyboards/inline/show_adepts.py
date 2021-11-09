@@ -17,6 +17,12 @@ show_adepts = InlineKeyboardMarkup(inline_keyboard=[
             callback_data=open_menu_callback.new(menu="suggest_theme", id="0")
         )
     ],
+    [
+        InlineKeyboardButton(
+            text="Мой профиль",
+            callback_data=open_menu_callback.new(menu="my_profile", id="0")
+        )
+    ]
 ])
 
 

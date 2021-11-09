@@ -6,3 +6,4 @@ from . import suggestion
 from . import admin
 from . import themes
 from . import question
+from . import user

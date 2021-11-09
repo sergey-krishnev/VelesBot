@@ -73,3 +73,12 @@ CREATE TABLE suggestions
     name TEXT NOT NULL,
     user_id integer NOT NULL
 );
+
+CREATE TABLE users
+(
+    id INTEGER PRIMARY KEY,
+    coin integer NOT NULL DEFAULT 100 CHECK(coin >= 0),
+    energy integer NOT NULL DEFAULT 200 CHECK(energy >= 0),
+    rank integer NOT NULL DEFAULT 1 CHECK(rank > 0)
+);
+
