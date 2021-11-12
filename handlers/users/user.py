@@ -7,7 +7,7 @@ from utils.db_api.user_dao import get_user_by_id, register_user
 
 
 @dp.callback_query_handler(open_menu_callback.filter(menu="my_profile"))
-async def open_great_tree(call: CallbackQuery):
+async def open_my_profile(call: CallbackQuery):
     user = get_user_by_id(call.from_user.id)
     if user is None:
         register_user(call.from_user.id)

@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from keyboards.inline.callback_data import open_menu_callback
 from keyboards.inline.common import back_to_tree
+from utils.constants import DIALOG_ENERGY_COST
 from utils.db_api import db
 
 show_adepts = InlineKeyboardMarkup(inline_keyboard=[
@@ -51,7 +52,7 @@ def get_adept_detailed(adept_id) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(
-                text="Начать диалог",
+                text=f"Начать диалог ( Стоимость {DIALOG_ENERGY_COST} энергии )",
                 callback_data=open_menu_callback.new(menu="dialog_start", id=adept_id)
             )
         ],
