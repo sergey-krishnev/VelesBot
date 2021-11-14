@@ -1,3 +1,4 @@
+from utils.constants import MAX_ENERGY
 from utils.db_api import db
 
 
@@ -16,5 +17,11 @@ def get_user_by_id(user_id):
 def spend_energy(user_id, energy):
     cursor = db.get_cursor()
     cursor.execute(f"UPDATE users SET energy = energy - ? WHERE id= ?", (energy, user_id))
+    cursor.close()
+
+
+def restore_energy_using_coins(user_id, coin):
+    cursor = db.get_cursor()
+    cursor.execute(f"UPDATE users SET energy = ?, coin = coin - ? WHERE id= ?", (MAX_ENERGY, coin, user_id))
     cursor.close()
 

@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 
 from keyboards.inline.callback_data import open_menu_callback
+from keyboards.inline.no_energy import no_energy_options
 from keyboards.inline.show_dialogs import get_active_dialogs
 from keyboards.inline.suggest_question import add_question_to_connection, finish_suggest
 from loader import dp
@@ -42,7 +43,7 @@ async def start_dialog(call: CallbackQuery, callback_data: dict):
         question = get_random_question_by_theme(theme_id)
         prev_question_id = question.get("id")
         if get_user_by_id(call.from_user.id).get("energy") < DIALOG_ENERGY_COST:
-            await call.message.edit_text(f"Не хватает энергии", reply_markup=finish_suggest)
+            await call.message.edit_text(f"Не хватает энергии", reply_markup=no_energy_options)
             return
         connection_id = add_connection(prev_question_id)
         add_checkpoint(connection_id, call.from_user.id)
