@@ -19,5 +19,5 @@ async def suggest_question(call: CallbackQuery):
 async def catch_question(message: types.Message, state: FSMContext):
     suggestion = message.text
     add_suggestion(suggestion, message.from_user.id)
-    await message.answer(f"Ваш предложение: '{suggestion}' добавлено", reply_markup=finish_suggest)
+    await message.answer(f"Ваше предложение: '{suggestion}' добавлено", reply_markup=finish_suggest)
     await state.finish()

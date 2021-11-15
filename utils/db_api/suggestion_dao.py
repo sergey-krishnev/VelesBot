@@ -11,7 +11,7 @@ def add_suggestion(suggestion_name, user_id):
 
 def get_suggestion_by_id(suggestion_id):
     result = None
-    suggestions = db.fetchall_with_filter("suggestions", ["name"], [f"id={suggestion_id}"])
+    suggestions = db.fetchall_with_filter("suggestions", ["name", "user_id"], [f"id={suggestion_id}"])
     if suggestions:
-        result = suggestions[0].get("name")
+        result = suggestions[0]
     return result

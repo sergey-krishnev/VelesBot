@@ -10,6 +10,7 @@ from loader import dp
 from states.add_root_question import RootQuestionCreation
 from utils.db_api.question_dao import add_question
 from utils.db_api.suggestion_dao import get_suggestion_by_id
+from utils.db_api.user_dao import add_coins
 
 
 @dp.callback_query_handler(open_menu_callback.filter(menu="add_root_question"), state=None)
@@ -27,7 +28,10 @@ async def suggest_question(call: CallbackQuery):
 async def suggested_question(call: CallbackQuery, callback_data: dict):
     suggestion_id = callback_data.get("id")
     suggestion = get_suggestion_by_id(suggestion_id)
-    await call.message.edit_text(f"Перепишите вопрос в соответствии с правилами: '{suggestion}'")
+    suggestion_user_id = suggestion.get("user_id")
+    add_coins(suggestion_user_id, 1)
+    suggestion_name = suggestion.get("name")
+    await call.message.edit_text(f"Перепишите вопрос в соответствии с правилами: '{suggestion_name}'")
     await RootQuestionCreation.QUESTION.set()
 
 
