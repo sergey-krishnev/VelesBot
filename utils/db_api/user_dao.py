@@ -25,3 +25,8 @@ def restore_energy_using_coins(user_id, coin):
     cursor.execute(f"UPDATE users SET energy = ?, coin = coin - ? WHERE id= ?", (MAX_ENERGY, coin, user_id))
     cursor.close()
 
+
+def add_coins(user_id, coin):
+    cursor = db.get_cursor()
+    cursor.execute(f"UPDATE users SET coin = coin + ? WHERE id= ?", (coin, user_id))
+    cursor.close()

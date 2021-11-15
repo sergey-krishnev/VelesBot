@@ -18,6 +18,8 @@ def get_active_dialogs():
                                            else f"id={connection_ids[0]}", "answer_id is not null"])
 
     prev_question_ids = tuple([c["prev_question_id"] for c in connections])
+    if len(prev_question_ids) == 0:
+        return None
     questions = db.fetchall_with_filter("questions", ["id", "name"],
                                         [f"id in {prev_question_ids}"
                                          if len(prev_question_ids) > 1

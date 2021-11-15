@@ -17,12 +17,13 @@ from utils.db_api.answer_dao import add_answer
 from utils.db_api.checkpoint_dao import add_checkpoint, has_not_checkpoint, get_checkpoint_by_user_id, \
     is_not_solved_checkpoint, update_checkpoint_to_solve, update_checkpoint_to_unsolve, remove_checkpoint
 from utils.db_api.connection_dao import add_connection, update_connection_with_answer, \
-    update_connection_with_next_question, get_next_question_by_id, get_prev_question_by_id
+    update_connection_with_next_question, get_next_question_by_id, get_prev_question_by_id, \
+    get_prev_connection_by_next_question_id
 from utils.db_api.dialog_dao import get_dialog_detailed
-from utils.db_api.question_dao import get_random_question_by_theme, add_question_without_theme,\
+from utils.db_api.question_dao import get_random_question_by_theme, add_question_without_theme, \
     get_question_name_by_id, get_question_by_id
 from utils.db_api.theme_dao import get_random_theme_by_adept
-from utils.db_api.user_dao import spend_energy, get_user_by_id, register_user
+from utils.db_api.user_dao import spend_energy, get_user_by_id, register_user, add_coins
 
 
 @dp.callback_query_handler(open_menu_callback.filter(menu="dialog_start"), state=None)
@@ -55,6 +56,14 @@ async def start_dialog(call: CallbackQuery, callback_data: dict):
 
 @dp.message_handler(lambda message: message.text.lower() == "пока", state=Dialog.ANSWER)
 async def catch_goodbye(message: types.Message, state: FSMContext):
+    checkpoint = get_checkpoint_by_user_id(message.from_user.id)
+    connection_id = checkpoint.get("connection_id")
+    prev_question_id = get_prev_question_by_id(connection_id)
+    prev_connection = get_prev_connection_by_next_question_id(prev_question_id)
+    if prev_connection is not None and len(get_dialog_detailed(prev_connection.get("id"))) >= 10:
+        add_coins(message.from_user.id, 2)
+        await message.answer_sticker("https://chpic.su/_data/stickers/m/Moneydolars/Moneydolars_003.webp")
+        # TODO draw own sticker
     remove_checkpoint(message.from_user.id)
     await message.answer("Диалог окончен", reply_markup=finish_suggest)
     await state.finish()
@@ -80,6 +89,8 @@ async def catch_answer(message: types.Message, state: FSMContext):
         await asyncio.sleep(30)
     await state.reset_data()
     next_question_id = get_next_question_by_id(connection_id)
+    if next_question_id is None:
+        return
     await message.answer(get_question_name_by_id(next_question_id))
     next_connection_id = add_connection(next_question_id)
     update_checkpoint_to_unsolve(next_connection_id, checkpoint.get("id"))

@@ -34,3 +34,12 @@ def get_prev_question_by_id(connection_id):
     if connections:
         result = connections[0].get("prev_question_id")
     return result
+
+
+def get_prev_connection_by_next_question_id(prev_question_id):
+    result = None
+    prev_connections = db.fetchall_with_filter("connections", ["id", "prev_question_id", "answer_id"],
+                                               [f"next_question_id={prev_question_id}"])
+    if prev_connections:
+        result = prev_connections[0]
+    return result
