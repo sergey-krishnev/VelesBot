@@ -2,3 +2,5 @@ from typing import Final
 
 MAX_ENERGY: Final = 200
 DIALOG_ENERGY_COST: Final = 10
+ADEPT_COST_SELECT = 200
+ADEPT_COST_RANDOM = 100

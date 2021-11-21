@@ -30,3 +30,9 @@ def add_coins(user_id, coin):
     cursor = db.get_cursor()
     cursor.execute(f"UPDATE users SET coin = coin + ? WHERE id= ?", (coin, user_id))
     cursor.close()
+
+
+def spend_coins(user_id, coin):
+    cursor = db.get_cursor()
+    cursor.execute(f"UPDATE users SET coin = coin - ? WHERE id= ?", (coin, user_id))
+    cursor.close()

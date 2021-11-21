@@ -82,3 +82,12 @@ CREATE TABLE users
     rank integer NOT NULL DEFAULT 1 CHECK(rank > 0)
 );
 
+CREATE TABLE trust
+(
+    id INTEGER PRIMARY KEY,
+    user_id integer NOT NULL,
+    adept_id integer NOT NULL,
+    trust_level integer NOT NULL,
+    points integer NOT NULL
+);
+
