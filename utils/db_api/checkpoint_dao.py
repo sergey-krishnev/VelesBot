@@ -27,6 +27,16 @@ def update_checkpoint_to_unsolve(connection_id, checkpoint_id):
     cursor.close()
 
 
+def finish_dialog(connection_id):
+    cursor = db.get_cursor()
+    cursor.execute("UPDATE checkpoints SET finished=1 WHERE connection_id= ?", (connection_id,))
+    cursor.close()
+
+
+def is_finished_dialog(user_id):
+    return len(db.fetchall_with_filter("checkpoints", ["id"], [f"user_id={user_id}", "finished=1"])) != 0
+
+
 def get_checkpoint_by_user_id(user_id):
     result = None
     checkpoints = db.fetchall_with_filter("checkpoints", ["id", "connection_id"], [f"user_id={user_id}"])

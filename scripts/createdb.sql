@@ -60,6 +60,7 @@ CREATE TABLE checkpoints
     connection_id INTEGER NOT NULL,
     user_id integer NOT NULL,
     solved boolean NOT NULL CHECK (solved IN (0, 1)) DEFAULT 0,
+    finished boolean NOT NULL CHECK (solved IN (0, 1)) DEFAULT 0,
     FOREIGN KEY (connection_id) REFERENCES connections(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

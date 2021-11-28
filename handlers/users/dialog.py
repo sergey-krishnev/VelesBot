@@ -15,7 +15,8 @@ from utils.constants import DIALOG_ENERGY_COST
 from utils.db_api.adept_dao import get_adept_by_id
 from utils.db_api.answer_dao import add_answer
 from utils.db_api.checkpoint_dao import add_checkpoint, has_not_checkpoint, get_checkpoint_by_user_id, \
-    is_not_solved_checkpoint, update_checkpoint_to_solve, update_checkpoint_to_unsolve, remove_checkpoint
+    is_not_solved_checkpoint, update_checkpoint_to_solve, update_checkpoint_to_unsolve, remove_checkpoint, \
+    finish_dialog, is_finished_dialog
 from utils.db_api.connection_dao import add_connection, update_connection_with_answer, \
     update_connection_with_next_question, get_next_question_by_id, get_prev_question_by_id, \
     get_prev_connection_by_next_question_id
@@ -54,7 +55,8 @@ async def start_dialog(call: CallbackQuery, callback_data: dict):
     await Dialog.ANSWER.set()
 
 
-@dp.message_handler(lambda message: message.text.lower() == "пока", state=Dialog.ANSWER)
+@dp.message_handler(lambda message: message.text.lower() == "пока" or is_finished_dialog(message.from_user.id),
+                    state=Dialog.ANSWER)
 async def catch_goodbye(message: types.Message, state: FSMContext):
     checkpoint = get_checkpoint_by_user_id(message.from_user.id)
     connection_id = checkpoint.get("connection_id")
@@ -118,8 +120,20 @@ async def show_dialog_detailed(call: CallbackQuery, callback_data: dict):
 async def get_connection(call: CallbackQuery, callback_data: dict, state: FSMContext):
     connection_id = callback_data.get("id")
     await state.update_data(connection_id=connection_id)
-    await call.message.edit_text("Введите вопрос:")
+    await call.message.edit_text("Введите вопрос или скажите 'пока':")
     await QuestionToConnection.next()
+
+
+@dp.message_handler(lambda message: message.text.lower() == "пока", state=QuestionToConnection.QUESTION)
+async def say_goodbye_by_admin(message: types.Message, state: FSMContext):
+    question = message.text
+    data = await state.get_data()
+    next_question_id = add_question_without_theme(question)
+    update_connection_with_next_question(data.get("connection_id"), next_question_id)
+    update_checkpoint_to_solve(data.get("connection_id"))
+    finish_dialog(data.get("connection_id"))
+    await message.answer("Диалог окончен")
+    await state.finish()
 
 
 @dp.message_handler(state=QuestionToConnection.QUESTION)
