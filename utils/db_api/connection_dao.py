@@ -1,4 +1,5 @@
 from utils.db_api import db
+from utils.db_api.postgres_db import QuickConnection
 
 
 def add_connection(prev_question_id):
@@ -9,15 +10,14 @@ def add_connection(prev_question_id):
 
 
 def update_connection_with_answer(connection_id, answer_id):
-    cursor = db.get_cursor()
-    cursor.execute("UPDATE connections SET answer_id = ? WHERE id= ?", (answer_id, connection_id))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute("UPDATE connections SET answer_id = %s WHERE id= %s", (str(answer_id), str(connection_id)))
 
 
 def update_connection_with_next_question(connection_id, next_question_id):
-    cursor = db.get_cursor()
-    cursor.execute("UPDATE connections SET next_question_id = ? WHERE id= ?", (next_question_id, connection_id))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute("UPDATE connections SET next_question_id = %s WHERE id= %s", (str(next_question_id),
+                                                                                     str(connection_id)))
 
 
 def get_next_question_by_id(connection_id):

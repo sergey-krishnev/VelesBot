@@ -26,7 +26,7 @@ async def catch_theme_name(message: types.Message, state: FSMContext):
 @dp.message_handler(state=ThemeCreation.TRUST_LEVEL)
 async def catch_trust_level(message: types.Message, state: FSMContext):
     trust_level = message.text
-    if trust_level.isdigit() and 1 < int(trust_level) < 5:
+    if trust_level.isdigit() and 1 <= int(trust_level) <= 5:
         await state.update_data(trust_level=trust_level)
         await message.answer("Выберите адепта", reply_markup=get_admin_adept_keyboard())
         await ThemeCreation.next()

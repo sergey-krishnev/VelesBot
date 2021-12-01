@@ -1,4 +1,5 @@
 from utils.db_api import db
+from utils.db_api.postgres_db import QuickConnection
 
 
 def add_checkpoint(connection_id, user_id):
@@ -10,31 +11,28 @@ def add_checkpoint(connection_id, user_id):
 
 
 def remove_checkpoint(user_id):
-    cursor = db.get_cursor()
-    cursor.execute(f"delete from checkpoints where user_id={user_id}")
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute(f"delete from checkpoints where user_id={user_id}")
 
 
 def update_checkpoint_to_solve(connection_id):
-    cursor = db.get_cursor()
-    cursor.execute("UPDATE checkpoints SET solved=1 WHERE connection_id= ?", (connection_id,))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute("UPDATE checkpoints SET solved=TRUE WHERE connection_id= %s", (str(connection_id),))
 
 
 def update_checkpoint_to_unsolve(connection_id, checkpoint_id):
-    cursor = db.get_cursor()
-    cursor.execute("UPDATE checkpoints SET solved=0, connection_id=? WHERE id= ?", (connection_id, checkpoint_id))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute("UPDATE checkpoints SET solved=FALSE, connection_id=%s WHERE id= %s", (str(connection_id),
+                                                                                              str(checkpoint_id)))
 
 
 def finish_dialog(connection_id):
-    cursor = db.get_cursor()
-    cursor.execute("UPDATE checkpoints SET finished=1 WHERE connection_id= ?", (connection_id,))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute("UPDATE checkpoints SET finished=TRUE WHERE connection_id= %s", (str(connection_id),))
 
 
 def is_finished_dialog(user_id):
-    return len(db.fetchall_with_filter("checkpoints", ["id"], [f"user_id={user_id}", "finished=1"])) != 0
+    return len(db.fetchall_with_filter("checkpoints", ["id"], [f"user_id={user_id}", "finished=TRUE"])) != 0
 
 
 def get_checkpoint_by_user_id(user_id):
@@ -50,4 +48,4 @@ def has_not_checkpoint(user_id):
 
 
 def is_not_solved_checkpoint(user_id):
-    return len(db.fetchall_with_filter("checkpoints", ["id"], [f"user_id={user_id}", "solved=0"])) != 0
+    return len(db.fetchall_with_filter("checkpoints", ["id"], [f"user_id={user_id}", "solved=FALSE"])) != 0

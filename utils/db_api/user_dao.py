@@ -1,5 +1,6 @@
 from utils.constants import MAX_ENERGY
 from utils.db_api import db
+from utils.db_api.postgres_db import QuickConnection
 
 
 def register_user(user_id):
@@ -15,24 +16,21 @@ def get_user_by_id(user_id):
 
 
 def spend_energy(user_id, energy):
-    cursor = db.get_cursor()
-    cursor.execute(f"UPDATE users SET energy = energy - ? WHERE id= ?", (energy, user_id))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute(f"UPDATE users SET energy = energy - %s WHERE id= %s", (str(energy), str(user_id)))
 
 
 def restore_energy_using_coins(user_id, coin):
-    cursor = db.get_cursor()
-    cursor.execute(f"UPDATE users SET energy = ?, coin = coin - ? WHERE id= ?", (MAX_ENERGY, coin, user_id))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute(f"UPDATE users SET energy = %s, coin = coin - %s WHERE id= %s", (str(MAX_ENERGY), str(coin),
+                                                                                        str(user_id)))
 
 
 def add_coins(user_id, coin):
-    cursor = db.get_cursor()
-    cursor.execute(f"UPDATE users SET coin = coin + ? WHERE id= ?", (coin, user_id))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute(f"UPDATE users SET coin = coin + %s WHERE id= %s", (str(coin), str(user_id)))
 
 
 def spend_coins(user_id, coin):
-    cursor = db.get_cursor()
-    cursor.execute(f"UPDATE users SET coin = coin - ? WHERE id= ?", (coin, user_id))
-    cursor.close()
+    with QuickConnection() as cursor:
+        cursor.execute(f"UPDATE users SET coin = coin - %s WHERE id= %s", (str(coin), str(user_id)))
